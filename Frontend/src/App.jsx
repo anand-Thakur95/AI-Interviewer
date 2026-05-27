@@ -1,13 +1,16 @@
+import { Routes, Route } from "react-router-dom"
+import Home from "./Pages/Home"
+import Auth from "./Pages/Auth"
 function App() {
  
 
   return (
-   <>
-   <div>
+ <Routes>
+<Route path= '/' element = {<Home/>}/>
 
-    <h1 className='text-3xl font-bold underline text-red-500'>Hello World</h1>
-   </div>
-   </>
+<Route path= '/auth' element = {<Auth/>}/>
+
+ </Routes>
   )
 }
 
