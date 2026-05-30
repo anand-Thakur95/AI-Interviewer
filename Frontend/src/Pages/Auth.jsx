@@ -9,20 +9,23 @@ import { serverURL } from '../App'
 
 
 function Auth() {
+    
 
     const handleGoogleAuth = async () => {
-
         try {
-            const response = await signInWithPopup(auth, provider)
-           let User = response.user
-           let name = User.displayName
-           let email = User.email
+            const response = await signInWithPopup(auth, provider);
 
-           const result = await axios.post(serverURL + "/api/auth/google", {name, email}, {withCredentials:true})
-
-           console.log(result)
+            const { displayName: name, email } = response.user;
+    
+            const result = await axios.post(
+                serverURL + "/api/auth/google",
+                { name, email },
+                { withCredentials: true }
+            );
+            console.log(result.data.user)
+    
         } catch (error) {
-            console.log(error)
+            console.error("ERROR:", error)
         }
     }
   return (

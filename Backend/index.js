@@ -14,10 +14,10 @@ app.use(cookieParser())
 
 app.use(cors({
     origin:"http://localhost:5173",
-    Credentials:true
+    credentials: true
 }))
 
-app.use("api/auth", authRouter)
+app.use("/api/auth", authRouter)
 
 const PORT  = process.env.PORT || 5000;
 app.listen(PORT, ()=> {
