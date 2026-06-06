@@ -23,7 +23,7 @@ function Auth() {
                 { withCredentials: true }
             );
             console.log(result.data.user)
-    
+           
         } catch (error) {
             console.error("ERROR:", error)
         }
