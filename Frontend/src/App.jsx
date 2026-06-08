@@ -1,16 +1,16 @@
+import { useEffect } from "react"
 import { Routes, Route } from "react-router-dom"
-import Home from "./Pages/Home"
-import Auth from "./Pages/Auth"
-import { getCurrentUser }  from "./service/api"
+import Home from "./Pages/Home.jsx"
+import Auth from "./Pages/Auth.jsx"
+import { getCurrentUser } from "./services/api"
 
-export const serverURL = "http://localhost:3000"
-
+export const serverUrl = "http://localhost:3000"
 
 function App() {
- useEffect(()=>{
-getCurrentUser()
-
- })
+  useEffect(() => {
+    getCurrentUser()
+  }, [])
+  
   return (
  <Routes>
 <Route path= '/' element = {<Home/>}/>

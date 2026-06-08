@@ -5,7 +5,7 @@ import { FcGoogle } from 'react-icons/fc'
 import {  signInWithPopup } from 'firebase/auth'
 import { auth, provider } from '../utils/firebase'
 import axios from 'axios'
-import { serverURL } from '../App'
+import { serverUrl } from '../App.jsx'
 
 
 function Auth() {
@@ -18,7 +18,7 @@ function Auth() {
             const { displayName: name, email } = response.user;
     
             const result = await axios.post(
-                serverURL + "/api/auth/google",
+                serverUrl + "/api/auth/google",
                 { name, email },
                 { withCredentials: true }
             );
