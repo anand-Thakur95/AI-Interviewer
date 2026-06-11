@@ -1,3 +1,4 @@
+
 import { BsRobot } from 'react-icons/bs'
 import { IoSparkles } from 'react-icons/io5'
 import{motion} from "motion/react"
@@ -6,26 +7,29 @@ import {  signInWithPopup } from 'firebase/auth'
 import { auth, provider } from '../utils/firebase'
 import axios from 'axios'
 import { serverUrl } from '../App.jsx'
+import { useDispatch } from 'react-redux'
+import { setUserData } from '../redux/user.slice.js'
+import { useNavigate } from 'react-router-dom'
 
 
 function Auth() {
-    
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const handleGoogleAuth = async () => {
-        try {
-            const response = await signInWithPopup(auth, provider);
 
-            const { displayName: name, email } = response.user;
-    
-            const result = await axios.post(
-                serverUrl + "/api/auth/google",
-                { name, email },
-                { withCredentials: true }
-            );
-            console.log(result.data.user)
-           
+        try {
+            const response = await signInWithPopup(auth, provider)
+           let User = response.user
+           let name = User.displayName
+           let email = User.email
+
+           const result = await axios.post(serverUrl + "/api/auth/google", {name, email}, {withCredentials:true})
+           dispatch(setUserData(result.data.user))
+           navigate('/')
         } catch (error) {
-            console.error("ERROR:", error)
+            console.log(error)
         }
     }
   return (

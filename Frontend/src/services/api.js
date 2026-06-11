@@ -6,7 +6,7 @@ export const getCurrentUser = async ()=>{
         const result = await axios.get(serverUrl + "/api/user/current",
             {withCredentials: true}
         )
-        console.log(result.data)
+        return result.data.user ?? result.data
     } catch (error) {
         console.error("ERROR:", error)
     }
