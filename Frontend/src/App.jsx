@@ -19,7 +19,7 @@ function App() {
       const result = await axios.get(serverUrl + "/api/user/current",
         {withCredentials: true}
       )
-      dispatch(setUserData(result.data.user))
+      dispatch(setUserData(result.data.user ?? result.data))
       } catch (error) {
       console.error("ERROR:", error)
     }
@@ -30,12 +30,11 @@ function App() {
   return (
     <>
     <Navbar/>
- <Routes>
-<Route path= '/' element = {<Home/>}/>
-<Route path= '/auth' element = {<Auth/>}/>
-
- </Routes>
-<Route path= '/' element = {<><Navbar/><Home/></>}/>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/auth" element={<Auth />} />
+    </Routes>
+    </>
   )
 }
 
