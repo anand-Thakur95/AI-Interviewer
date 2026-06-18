@@ -1,6 +1,6 @@
 function Home() {
   return (
-    <div>
+    <div className="min-h-screen pt-28">
       Home page
     </div>
   )

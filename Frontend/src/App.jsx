@@ -5,6 +5,7 @@ import Auth from "./Pages/Auth.jsx"
 import { useDispatch } from "react-redux"
 import axios from "axios"
 import { setUserData } from "./redux/user.slice.js"
+import Navbar from "./components/Navbar.jsx"
 
 export const serverUrl = "http://localhost:3000"
 
@@ -18,7 +19,7 @@ function App() {
       const result = await axios.get(serverUrl + "/api/user/current",
         {withCredentials: true}
       )
-      dispatch(setUserData(result.data.user ?? result.data))
+      dispatch(setUserData(result.data.user))
       } catch (error) {
       console.error("ERROR:", error)
     }
@@ -27,11 +28,14 @@ function App() {
   }, [ dispatch ]);
   
   return (
+    <>
+    <Navbar/>
  <Routes>
 <Route path= '/' element = {<Home/>}/>
 <Route path= '/auth' element = {<Auth/>}/>
 
  </Routes>
+<Route path= '/' element = {<><Navbar/><Home/></>}/>
   )
 }
 
