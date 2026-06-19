@@ -6,14 +6,31 @@ import { HiOutlineLogout } from 'react-icons/hi'
 import { FaUserAstronaut } from 'react-icons/fa'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-
+import { serverUrl } from '../App'
+import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { setUserData } from '../redux/user.slice.js'
 
 export default function Navbar() {
     const { userData } = useSelector((state) => state.user)
     const [showCreditPopup, setShowCreditPopup] = useState(false)
     const [showUserPopup, setShowUserPopup] = useState(false)
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+
+    const handleLogout = async () => {
+
+        try {
+            await axios.get(serverUrl + "/api/auth/logout", {withCredentials: true})
+            dispatch(setUserData(null))
+            setShowCreditPopup(false)
+            setShowUserPopup(false)
+            navigate("/auth")
+        } catch (error) {
+            console.log(error);
+            
+        }
+    }
 
   return (
     <div className='fixed top-0 left-0 w-full flex justify-center px-4 pt-6'>
@@ -55,7 +72,7 @@ export default function Navbar() {
                 <button
                 onClick={()=> setShowUserPopup(pre => !pre)}
                 
-                className='w-9 h-9 bg-black text-white rounded-full flrx item-center justify-center font-semibold'>
+                className='w-9 h-9  bg-black text-white rounded-full flex items-center justify-center font-semibold'>
             
                     {userData ?  userData?.name.slice(0,1).toUpperCase() : <FaUserAstronaut size={16}/>}
                 </button>
@@ -67,7 +84,10 @@ export default function Navbar() {
                             <button
                             onClick={()=> navigate("/history")}
                             className='w-full text-left text-sm py-2 hover:text-black text-gray-600'>Interview History</button>
-                            <button className='w-full text-left text-sm py-2 flex items-center gap-2 text-red-500'>
+
+                            <button
+                            onClick={handleLogout}
+                            className='w-full text-left text-sm py-2 flex items-center gap-2 text-red-500'>
                                 <HiOutlineLogout size={16}/>
                                 Logout</button>
                         </div>

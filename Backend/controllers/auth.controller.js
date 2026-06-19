@@ -29,11 +29,9 @@ export const googleAuth = async (req, res) => {
 }
 
 export const logout = async (req, res) => {
-
-    try {
-        await res.clearCookies("token")
-        return res.status(200).json({message: "Logout Successfully"})
-    } catch (error) {
-        return res.status(500).json({message: `Logout error ${error}`})
-    }
-}
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "strict",
+    });
+    return res.status(200).json({ message: "Logout Successfully" });
+  };
