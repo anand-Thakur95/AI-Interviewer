@@ -26,7 +26,7 @@ export default function Navbar() {
             dispatch(setUserData(null))
             setShowCreditPopup(false)
             setShowUserPopup(false)
-            navigate("/auth")
+            navigate("/")
         } catch (error) {
             console.log(error)
         }
