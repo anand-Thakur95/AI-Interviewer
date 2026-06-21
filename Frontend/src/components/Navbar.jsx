@@ -33,7 +33,7 @@ export default function Navbar() {
     }
 
     return (
-        <div className='fixed top-0 left-0 w-full flex justify-center px-4 pt-6'>
+        <div className=' top-0 left-0 w-full flex justify-center px-4 pt-6'>
             <motion.div
                 initial={{ opacity: 0, y: -40 }}
                 animate={{ opacity: 1, y: 0 }}

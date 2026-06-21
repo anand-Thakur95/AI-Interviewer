@@ -5,7 +5,7 @@ import Auth from "./Pages/Auth.jsx"
 import { useDispatch } from "react-redux"
 import axios from "axios"
 import { setUserData } from "./redux/user.slice.js"
-import Navbar from "./components/Navbar.jsx"
+
 
 export const serverUrl = "http://localhost:3000"
 
@@ -29,7 +29,7 @@ function App() {
   
   return (
     <>
-    <Navbar/>
+   
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/auth" element={<Auth />} />
