@@ -42,17 +42,31 @@ function Home() {
             and real-time performance evaluation.
           </motion.p>
 
-          <div className="flex flex-wrap justify-cwnter gap-4 mt-10">
-          {userData && (
+          <div className="flex flex-wrap justify-center gap-4 mt-10">
+{userData && (
   <motion.button
     onClick={() => navigate("/interview")}
     whileHover={{ opacity: 0.9, scale: 1.03 }}
     whileTap={{ opacity: 1, scale: 0.98 }}
-    className="bg-black text-white px-10 py-3 rounded-full hover:opacity-90 transition shadow-md"
+       className="bg-black text-white px-10 py-3 rounded-full hover:opacity-90 transition shadow-md shadow-gray-600"
   >
     Start Interview
   </motion.button>
 )}
+
+{userData && (
+  <motion.button
+    onClick={() => navigate("/interview")}
+    whileHover={{ opacity: 0.9, scale: 1.03 }}
+    whileTap={{ opacity: 1, scale: 0.98 }}
+   className="bg-gray-200 text-black px-10 py-3 rounded-full hover:opacity-90 transition shadow-md shadow-gray-400"
+  >
+  View History
+  </motion.button>
+
+  
+)}
+
           </div>
         </div>
       </div>
