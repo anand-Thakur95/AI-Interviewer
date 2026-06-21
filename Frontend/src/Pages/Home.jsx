@@ -194,6 +194,76 @@ function Home() {
   </div>
 </div>
 
+<div className="mb-32">
+
+  <motion.h2
+   initial={{ opacity: 0, y: 20 }}
+   whileInView={{opacity: 1, y: 0}}
+   transition={{ duration: 0.6 }}
+  className="text-4xl font-semibold text-center mb-16"
+  >
+
+    Multiple Interview{" "}
+    <span className="text-blue-600">Modes</span>
+  </motion.h2>
+
+  <div className="grid md:grid-cols-2 gap-10">
+
+    {
+[
+  {
+    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044726/ai-ans_sozs17.png",
+    icon: <BsBarChart size={20} />,
+    title: "AI Answer Evalution",
+    desc: "Scores communication, technical accuracy and confidence"
+  },
+  {
+    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044723/resume_e1konv.png",
+    icon: <BsFileEarmarkText size={20} />,
+    title: "Resume Based Interview",
+    desc: "Project-specific question based on uploaded resume."
+  },
+  {
+    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044723/pdf_ur0ci7.png",
+    icon: <BsFileEarmarkText size={20} />,
+    title: "Downloadable PDF Report",
+    desc: "Detailed strengths, weaknesses and improvement insights."
+  },
+  {
+    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044724/history_f3yvo2.png",
+    icon: <BsBarChart size={20} />,
+    title: "History & Analytics",
+    desc: "Track progress with performance graphs and topic analysis."
+  }
+].map((item, index)=>(
+  <motion.div key={index}
+  initial={{ opacity: 0, y: 30 }}
+  whileInView={{opacity: 1, y: 0}}
+  transition={{ duration: 0.5, delay: index * 0.1 }}
+  whileHover={{scale: 1.02}}
+  className="bg-white border border-gray-200 rounded-3xl shadow-sm hover:shadow-xl transition-all">
+
+    <div className="flex flex-col md:flex-row items-center gap-8 m-3">
+
+      <div className="w-full md:w-1/2 flex justify-center">
+      <img src={item.image} alt={item.title} className="w-full h-auto object-contain max-h-64" />
+      </div>
+
+      <div className="w-full md:w-1/2">
+      <div className="bg-blue-50 text-blue-600 w-12 h-12 rounded-xl flex items-center justify-center mb-6">
+        {item.icon}
+      </div>
+      <h3 className="font-semibold mb-3 text-xl">{item.title}</h3>
+      <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+      </div>
+    </div>
+
+  </motion.div>
+))
+
+    }
+  </div>
+</div>
       </div>
       </div>
     </div>
