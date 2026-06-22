@@ -212,28 +212,24 @@ function Home() {
     {
 [
   {
-    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044726/ai-ans_sozs17.png",
-    icon: <BsBarChart size={20} />,
-    title: "AI Answer Evalution",
-    desc: "Scores communication, technical accuracy and confidence"
+    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044724/HR_tois32.png",
+    title: "Hr Interview Mode",
+    desc: "Behavioral and communication based avaluation"
   },
   {
-    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044723/resume_e1konv.png",
-    icon: <BsFileEarmarkText size={20} />,
-    title: "Resume Based Interview",
-    desc: "Project-specific question based on uploaded resume."
+    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044724/tech_cu5n9d.png",
+    title: "Technical Mode",
+    desc: "Deep technical questioning based on selected role."
   },
   {
-    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044723/pdf_ur0ci7.png",
-    icon: <BsFileEarmarkText size={20} />,
-    title: "Downloadable PDF Report",
-    desc: "Detailed strengths, weaknesses and improvement insights."
+    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044724/confi_ohuyzt.png",
+    title: "Confidence Detection",
+    desc: "Basic tone and voice analysis insights"
   },
   {
-    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044724/history_f3yvo2.png",
-    icon: <BsBarChart size={20} />,
-    title: "History & Analytics",
-    desc: "Track progress with performance graphs and topic analysis."
+    image: "https://res.cloudinary.com/dgmoa4vas/image/upload/v1782044726/credit_zw2msx.png",
+    title: "Credit System",
+    desc: "Unlock premium interview sessions easily."
   }
 ].map((item, index)=>(
   <motion.div key={index}
@@ -250,9 +246,6 @@ function Home() {
       </div>
 
       <div className="w-full md:w-1/2">
-      <div className="bg-blue-50 text-blue-600 w-12 h-12 rounded-xl flex items-center justify-center mb-6">
-        {item.icon}
-      </div>
       <h3 className="font-semibold mb-3 text-xl">{item.title}</h3>
       <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
       </div>
