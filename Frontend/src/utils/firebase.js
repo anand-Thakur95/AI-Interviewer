@@ -5,7 +5,7 @@ import { GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
-  authDomain: "ai-interviewer-d6504.firebaseapp.com",
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
   projectId: "ai-interviewer-d6504",
   storageBucket: "ai-interviewer-d6504.firebasestorage.app",
   messagingSenderId: "631197476900",
