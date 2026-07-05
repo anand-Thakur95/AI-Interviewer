@@ -7,6 +7,9 @@ import {
   FaMicrophoneAlt,
   FaChartLine,
 } from "react-icons/fa";
+import { serverUrl } from "../App";
+import { linkWithCredential } from "firebase/auth";
+import axios from "axios";
 
 function Step1Setup() {
   const [role, setRole] = useState("");
@@ -19,6 +22,31 @@ function Step1Setup() {
   const [resumeText, setResumeText] = useState("");
   const [analysisDone, setAnalysisDone] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+
+
+  const handleUploadResume = async () => {
+    if(!resumeFile || analyzing) return;
+    setAnalyzing(true)
+
+    const formdata = new FormData()
+    formdata.append("resume", resumeFile)
+
+    try {
+      const result = await axios.post(serverUrl + "/api/interview/resume", formdata, {withCredentials : true})
+
+      console.log(result.data)
+
+      setRole(result.data.role || "");
+      setExperience(result.data.experience || "");
+      setProjects(result.data.projects || [])
+      setSkills(result.data.skills || []);
+      setResumeText(result.data.resumeText || "");
+      setAnalyzing(true);
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <motion.div
@@ -131,7 +159,7 @@ function Step1Setup() {
 
               {resumeFile && (<motion.button
               whileHover={{scale: 1.03}}
-              // onClick={handleAnalyze}
+            onClick={(e)=>{e.stopPropagation(); handleUploadResume()}}
               className="mt-4 bg-gray-900 text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition">
                {analyzing ? "Analyzing..." : "Analyze Resume"}
               </motion.button>)}

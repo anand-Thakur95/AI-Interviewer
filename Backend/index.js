@@ -5,7 +5,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors"
 import authRouter from "./routers/auth.route.js";
 import userRouter from "./routers/user.router.js";
-import interviewRouter from "./routers/interview.router.js";
+import interRouter from "./routers/inter.route.js";
+
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ app.use("/api/auth", authRouter)
 
 app.use("/api/user", userRouter)
 
-app.use("/api/interview", interviewRouter)
+app.use("/api/interview", interRouter)
 
 const PORT  = process.env.PORT || 5000;
 app.listen(PORT, ()=> {
