@@ -22,6 +22,8 @@ app.use("/api/auth", authRouter)
 
 app.use("/api/user", userRouter)
 
+app.use("/api/interview", interviewRouter)
+
 const PORT  = process.env.PORT || 5000;
 app.listen(PORT, ()=> {
     connectDB();
