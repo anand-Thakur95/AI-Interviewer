@@ -41,10 +41,11 @@ function Step1Setup() {
       setProjects(result.data.projects || [])
       setSkills(result.data.skills || []);
       setResumeText(result.data.resumeText || "");
-      setAnalyzing(true);
-
+      setAnalysisDone(true);
     } catch (error) {
       console.log(error)
+    } finally {
+      setAnalyzing(false);
     }
   }
 
@@ -142,11 +143,24 @@ function Step1Setup() {
                 <option value="HR">HR Interview</option>
               </select>
             </div>
-            {!analysisDone && (
+            {analysisDone ? (
               <motion.div
-              whileHover={{scale: 1.03}}
-              onClick={()=>document.getElementById("resume-input").click()}
-              className="border-2 bg-blue-50 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-600 transition flex flex-col items-center justify-center">
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="border-2 border-blue-200 bg-blue-50 rounded-xl p-8 text-center flex flex-col items-center justify-center"
+              >
+                <FaFileUpload className="text-blue-600 text-2xl mb-4" />
+                <p className="text-blue-700 font-semibold">Analysis Done</p>
+                {resumeFile && (
+                  <p className="text-gray-500 text-sm mt-2">{resumeFile.name}</p>
+                )}
+              </motion.div>
+            ) : (
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                onClick={() => document.getElementById("resume-input").click()}
+                className="border-2 bg-blue-50 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-600 transition flex flex-col items-center justify-center"
+              >
                 <FaFileUpload className="text-blue-600 text-2xl mb-4 flex items-center justify-center" />
                 <input
                   type="file"
@@ -155,15 +169,26 @@ function Step1Setup() {
                   className="hidden"
                   id="resume-input"
                 />
-              <p className="text-gray-600 font-medium">{resumeFile ? resumeFile.name : "Click to upload or drag and drop"}</p>
+                <p className="text-gray-600 font-medium">
+                  {resumeFile ? resumeFile.name : "Click to upload or drag and drop"}
+                </p>
 
-              {resumeFile && (<motion.button
-              whileHover={{scale: 1.03}}
-            onClick={(e)=>{e.stopPropagation(); handleUploadResume()}}
-              className="mt-4 bg-gray-900 text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition">
-               {analyzing ? "Analyzing..." : "Analyze Resume"}
-              </motion.button>)}
+                {resumeFile && !analyzing && (
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUploadResume();
+                    }}
+                    className="mt-4 bg-gray-900 text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition"
+                  >
+                    Analyze Resume
+                  </motion.button>
+                )}
 
+                {analyzing && (
+                  <p className="mt-4 text-gray-600 font-medium">Analyzing...</p>
+                )}
               </motion.div>
             )}
 

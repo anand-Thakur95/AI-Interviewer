@@ -7,8 +7,7 @@ export const analyzeResume = async (req, res) => {
             return res.status(400).json({ message: "Resume required" });
         }
 
-        // multer is configured with memoryStorage, so the file is in req.file.buffer
-        // (no disk write, nothing to read from a path, nothing to delete afterwards)
+      
         const uint8Array = new Uint8Array(req.file.buffer);
 
         const pdf = await pdfjsLib.getDocument({ data: uint8Array }).promise;
