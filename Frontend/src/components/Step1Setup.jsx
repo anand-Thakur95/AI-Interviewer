@@ -10,6 +10,7 @@ import {
 import { serverUrl } from "../App";
 import { linkWithCredential } from "firebase/auth";
 import axios from "axios";
+import { div, span } from "motion/react-client";
 
 function Step1Setup() {
   const [role, setRole] = useState("");
@@ -23,31 +24,34 @@ function Step1Setup() {
   const [analysisDone, setAnalysisDone] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
 
-
   const handleUploadResume = async () => {
-    if(!resumeFile || analyzing) return;
-    setAnalyzing(true)
+    if (!resumeFile || analyzing) return;
+    setAnalyzing(true);
 
-    const formdata = new FormData()
-    formdata.append("resume", resumeFile)
+    const formdata = new FormData();
+    formdata.append("resume", resumeFile);
 
     try {
-      const result = await axios.post(serverUrl + "/api/interview/resume", formdata, {withCredentials : true})
+      const result = await axios.post(
+        serverUrl + "/api/interview/resume",
+        formdata,
+        { withCredentials: true },
+      );
 
-      console.log(result.data)
+      console.log(result.data);
 
       setRole(result.data.role || "");
       setExperience(result.data.experience || "");
-      setProjects(result.data.projects || [])
+      setProjects(result.data.projects || []);
       setSkills(result.data.skills || []);
       setResumeText(result.data.resumeText || "");
       setAnalysisDone(true);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     } finally {
       setAnalyzing(false);
     }
-  }
+  };
 
   return (
     <motion.div
@@ -152,7 +156,9 @@ function Step1Setup() {
                 <FaFileUpload className="text-blue-600 text-2xl mb-4" />
                 <p className="text-blue-700 font-semibold">Analysis Done</p>
                 {resumeFile && (
-                  <p className="text-gray-500 text-sm mt-2">{resumeFile.name}</p>
+                  <p className="text-gray-500 text-sm mt-2">
+                    {resumeFile.name}
+                  </p>
                 )}
               </motion.div>
             ) : (
@@ -170,7 +176,9 @@ function Step1Setup() {
                   id="resume-input"
                 />
                 <p className="text-gray-600 font-medium">
-                  {resumeFile ? resumeFile.name : "Click to upload or drag and drop"}
+                  {resumeFile
+                    ? resumeFile.name
+                    : "Click to upload or drag and drop"}
                 </p>
 
                 {resumeFile && !analyzing && (
@@ -189,6 +197,43 @@ function Step1Setup() {
                 {analyzing && (
                   <p className="mt-4 text-gray-600 font-medium">Analyzing...</p>
                 )}
+              </motion.div>
+            )}
+
+            {analysisDone && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4"
+              >
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Resume Analysis Results
+                </h3>
+
+                {projects.length > 0 && (
+                  <div>
+                    <p className="font-medium text-gray-700 mb-1">Projects:</p>
+
+                    <ul className="list-disc list-inside text-gray-600 soace-y-1">
+                      {projects.map((p, i) => (
+                        <li key={i}>{p}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+{skills.length > 0 && (
+                  <div>
+                    <p className="font-medium text-gray-700 mb-1">Skills:</p>
+
+                    <ul className="flex flex-wrap gap-2">
+                      {skills.map((s, i) => (
+                        <span key={i} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">{s}</span>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
               </motion.div>
             )}
 
