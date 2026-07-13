@@ -8,11 +8,13 @@ import {
   FaChartLine,
 } from "react-icons/fa";
 import { serverUrl } from "../App";
-import { linkWithCredential } from "firebase/auth";
 import axios from "axios";
-import { div, span } from "motion/react-client";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../redux/user.slice";
 
-function Step1Setup() {
+function Step1Setup({ onStart }) {
+  const {userData} = useSelector((state)=> state.user)
+  const dispatch = useDispatch()
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
   const [mode, setMode] = useState("Technical");
@@ -50,6 +52,34 @@ function Step1Setup() {
       console.log(error);
     } finally {
       setAnalyzing(false);
+    }
+  };
+
+  const handleStart = async () => {
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        serverUrl + "/api/interview/generate-questions",
+        { role, experience, mode, resumeText, projects, skills },
+        { withCredentials: true },
+        
+      );
+      console.log(result.data);
+      if (userData) {
+        dispatch(
+          setUserData({ ...userData, credit: result.data.creditsLeft }),
+        );
+      }
+      onStart?.(result.data);
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to start interview";
+      console.error(message, error);
+      alert(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -237,8 +267,12 @@ function Step1Setup() {
               </motion.div>
             )}
 
-            <motion.button className="w-full disabled:bg-gray-600 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-full text-lg font-semibold transition duration-300 shadow-md">
-              Start Interview
+            <motion.button
+              onClick={handleStart}
+              disabled={loading || !role || !experience}
+              className="w-full disabled:bg-gray-600 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-full text-lg font-semibold transition duration-300 shadow-md"
+            >
+              {loading ? "Starting..." : "Start Interview"}
             </motion.button>
           </div>
         </motion.div>

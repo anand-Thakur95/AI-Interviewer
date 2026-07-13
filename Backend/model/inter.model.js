@@ -24,7 +24,7 @@ role:{
     required:true,
 
 },
-exprience:{
+experience:{
     type:String,
     required:true
 },

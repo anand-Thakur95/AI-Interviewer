@@ -59,7 +59,7 @@ export const analyzeResume = async (req, res) => {
 
 export const generateQuestion = async (req, res) => {
     try {
-        // FIX: was `const`, but role/experience/mode get reassigned below -> must be `let`
+        
         let { role, experience, mode, resumeText, projects, skills } = req.body;
         role = role?.trim();
         experience = experience?.trim();
@@ -73,7 +73,7 @@ export const generateQuestion = async (req, res) => {
         if (!user) {
             return res.status(400).json({ message: "User not found." });
         }
-        if (user.credits < 50) {
+        if (user.credit < 50) {
             return res.status(400).json({ message: "Not enough credits. Minimum 50 required." });
         }
 
@@ -145,17 +145,17 @@ export const generateQuestion = async (req, res) => {
             return res.status(500).json({ message: "AI failed to generate questions" });
         }
 
-        user.credits -= 50;
+        user.credit -= 50;
         await user.save();
 
-        // FIX: difficulty/timeLimit arrays now have 10 entries matching the prompt's pattern
+     
         const difficulties = ["easy", "easy", "medium", "medium", "hard", "easy", "easy", "medium", "medium", "hard"];
         const timeLimits = [60, 60, 90, 90, 120, 60, 60, 90, 90, 120];
 
         const interview = await Interview.create({
             userId: user._id,
             role,
-            experience, // FIX: was `exprience` (typo, undefined variable -> ReferenceError)
+            experience, 
             mode,
             resumeText: safeResume,
             questions: questionsArray.map((q, index) => ({
@@ -167,13 +167,14 @@ export const generateQuestion = async (req, res) => {
 
         res.json({
             interviewId: interview._id,
-            creditsLeft: user.credits,
+            creditsLeft: user.credit,
             userName: user.name,
             questions: interview.questions
         });
 
     } catch (error) {
-        return res.status(500).json({ message: `failed to create interview ${error}` });
+        console.error("generateQuestion error:", error);
+        return res.status(500).json({ message: error.message || "Failed to create interview" });
     }
 };
 
