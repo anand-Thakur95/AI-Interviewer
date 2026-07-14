@@ -81,7 +81,7 @@ export const generateQuestion = async (req, res) => {
         const skillsText = Array.isArray(skills) && skills.length ? skills.join(", ") : "None";
         const safeResume = resumeText?.trim() || "None";
 
-        // FIX: was missing `const` -> implicit global / ReferenceError in strict mode
+        
         const userPrompt = `
         Role: ${role}
         Experience: ${experience}
@@ -130,7 +130,7 @@ export const generateQuestion = async (req, res) => {
 
         const aiResponse = await askAi(message);
 
-        // FIX: condition was inverted (`aiResponse.trim()` truthy = has content, but was treated as error)
+        
         if (!aiResponse || !aiResponse.trim()) {
             return res.status(500).json({ message: "AI returned empty response" });
         }
@@ -246,7 +246,7 @@ export const submitAnswer = async (req, res) => {
             }
         ];
 
-        // FIX: was calling askAi(message) — `message` doesn't exist here, should be `messages`
+    
         const aiResponse = await askAi(messages);
         const parsed = JSON.parse(aiResponse);
 
@@ -282,7 +282,7 @@ export const finishInterview = async (req, res) => {
         let totalCorrectness = 0;
 
         interview.questions.forEach((q) => {
-            totalScore += q.score || 0; // FIX: was `q.socre` (typo)
+            totalScore += q.score || 0; 
             totalConfidence += q.confidence || 0;
             totalCommunication += q.communication || 0;
             totalCorrectness += q.correctness || 0;
@@ -291,7 +291,7 @@ export const finishInterview = async (req, res) => {
         const finalScore = totalQuestions ? totalScore / totalQuestions : 0;
         const avgConfidence = totalQuestions ? totalConfidence / totalQuestions : 0;
         const avgCommunication = totalQuestions ? totalCommunication / totalQuestions : 0;
-        const avgCorrectness = totalQuestions ? totalCorrectness / totalQuestions : 0; // FIX: malformed nested ternary
+        const avgCorrectness = totalQuestions ? totalCorrectness / totalQuestions : 0; 
 
         interview.finalScore = finalScore;
         interview.status = "completed";
