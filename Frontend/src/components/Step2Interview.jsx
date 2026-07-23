@@ -3,7 +3,10 @@ import maleVideo from "../assets/male-ai.mp4";
 import femaleVideo from "../assets/female-ai.mp4";
 import Timer from "./Timer";
 import { motion } from "motion/react";
-import { FaMicrophone } from "react-icons/fa";
+import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { BsArrowLeft } from "react-icons/bs";
 
 function Step2Interview({ interviewData, onFinish }) {
   const { interviewId, questions, userName } = interviewData;
@@ -147,6 +150,7 @@ function Step2Interview({ interviewData, onFinish }) {
   useEffect(() => {
     if (isIntroPhase) return;
     if (!currentQuestion) return;
+    if(isSubmitting) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -159,7 +163,7 @@ function Step2Interview({ interviewData, onFinish }) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isIntroPhase, currentIndex]);
+  }, [isIntroPhase, currentIndex, isSubmitting]);
 
   // Set up speech recognition once
   useEffect(() => {
@@ -215,25 +219,42 @@ function Step2Interview({ interviewData, onFinish }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isIntroPhase, isMicOn, isAIPlaying, currentIndex]);
 
-  const handleSubmitAnswer = async () => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
+  
+
+
+  const submitAnswer = async () => {
+    if(isSubmitting) return;
+    stopMic()
+    setIsSubmitting(true)
+
 
     try {
-      // TODO: call your submitAnswer API here, e.g.
-      // await submitAnswer({ interviewId, questionId: currentQuestion._id, answer });
+      const result = await axios.post(serverUrl + "/api/interview/submit-answer",{
 
-      if (currentIndex < questions.length - 1) {
-        setCurrentIndex((prev) => prev + 1);
-        setAnswer("");
-        setTimeLeft(questions[currentIndex + 1]?.timeLimit || 60);
-      } else {
-        onFinish?.();
-      }
-    } finally {
-      setIsSubmitting(false);
+        interviewId,
+        questionIndex: currentIndex,
+        answer,
+        timeTaken: currentQuestion.timeLimit - timeLeft,
+      }, {withCredentials: true})
+
+      setFeedback(result.data.feedback)
+      speakText(result.data.feedback)
+      setIsSubmitting(false)
+    } catch (error) {
+      console.log(error);
+      setIsSubmitting(false)
+      
     }
-  };
+  }
+
+  const handleNext = async () => {
+
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-teal-100 flex items-center justify-center p-4 sm:p-6">
@@ -330,7 +351,7 @@ function Step2Interview({ interviewData, onFinish }) {
             className="flex-1 bg-gray-100 p-4 sm:p-6 rounded-2xl resize-none outline-none border border-gray-200 focus:ring-2 focus:ring-blue-500 transition text-gray-800"
           ></textarea>
 
-          <div className="flex items-center gap-4 mt-6">
+          { !feedback ? (<div className="flex items-center gap-4 mt-6">
             <motion.button
               onClick={toggleMic}
               className={`w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full text-white shadow-lg ${
@@ -338,18 +359,33 @@ function Step2Interview({ interviewData, onFinish }) {
               }`}
               whileTap={{ scale: 0.9 }}
             >
-              <FaMicrophone size={20} />
+             { isMicOn ? <FaMicrophone size={20} /> : <FaMicrophoneSlash size={20}/>}
             </motion.button>
 
             <motion.button
-              onClick={handleSubmitAnswer}
+              onClick={submitAnswer}
               disabled={isSubmitting}
               whileTap={{ scale: 0.9 }}
-              className="flex-1 bg-gradient-to-r from-blue-600 to-blue-400 text-white py-3 sm:py-4 rounded-2xl shadow-lg hover:opacity-90 transition font-semibold disabled:opacity-50"
+              className="flex-1 bg-gradient-to-r from-blue-600 to-blue-400 text-white py-3 sm:py-4 rounded-2xl shadow-lg hover:opacity-90 transition font-semibold disabled:opacity-50 disable:bg-gray-500"
             >
               {isSubmitting ? "Submitting..." : "Submit Answer"}
             </motion.button>
-          </div>
+          </div>) : ( 
+
+            <motion.div
+            initial={{ opacity: 0}}
+            animate={{ opacity: 1}}
+            className="mt-6 bg-emerald-50 border border-emrald-200 p-5 rounded-2xl shadow-sm">
+
+<p className="text-blue-800 font-medium mb-4">{feedback}</p>
+              <button
+              
+              className="w-full bg-graient-to-r from-blue-600 to-teal-500 text-white py-3 rounded-xl shadow-md hover:opacity-90 transition flex items-center justify-center gap-1">
+Next Question <BsArrowLeft size={18}/>
+
+              </button>
+            </motion.div>
+          )}
         </div>
       </div>
     </div>
