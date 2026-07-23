@@ -16,7 +16,7 @@ function Step2Interview({ interviewData, onFinish }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
-  const [timeLeft, setTime] = useState(questions[0]?.timeLimit || 60);
+  const [timeLeft, setTimeLeft] = useState(questions[0]?.timeLimit || 60);
 
   const [selectedVoice, setSelectedVoice] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,7 +37,7 @@ function Step2Interview({ interviewData, onFinish }) {
         (v) =>
           v.name.toLowerCase().includes("zira") ||
           v.name.toLowerCase().includes("samantha") ||
-          v.name.toLowerCase().includes("female")
+          v.name.toLowerCase().includes("female"),
       );
 
       if (femaleVoice) {
@@ -50,7 +50,7 @@ function Step2Interview({ interviewData, onFinish }) {
         (v) =>
           v.name.toLowerCase().includes("david") ||
           v.name.toLowerCase().includes("mark") ||
-          v.name.toLowerCase().includes("male")
+          v.name.toLowerCase().includes("male"),
       );
 
       if (maleVoice) {
@@ -116,10 +116,10 @@ function Step2Interview({ interviewData, onFinish }) {
     const runIntro = async () => {
       if (isIntroPhase) {
         await speakText(
-          `Hi ${userName}, it's great to meet you today. I hope you're feeling confident and ready.`
+          `Hi ${userName}, it's great to meet you today. I hope you're feeling confident and ready.`,
         );
         await speakText(
-          "I'll ask you a few questions. Just answer naturally, and take your time. Let's begin."
+          "I'll ask you a few questions. Just answer naturally, and take your time. Let's begin.",
         );
         if (cancelled) return;
         setIsIntroPhase(false);
@@ -143,6 +143,78 @@ function Step2Interview({ interviewData, onFinish }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedVoice, isIntroPhase, currentIndex]);
 
+  // Countdown timer for the current question
+  useEffect(() => {
+    if (isIntroPhase) return;
+    if (!currentQuestion) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isIntroPhase, currentIndex]);
+
+  // Set up speech recognition once
+  useEffect(() => {
+    if (!("webkitSpeechRecognition" in window)) return;
+
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+      const transcript =
+        event.results[event.results.length - 1][0].transcript;
+      setAnswer((prev) => prev + " " + transcript);
+    };
+
+    recognitionRef.current = recognition;
+  }, []);
+
+  const startMic = () => {
+    if (recognitionRef.current && !isAIPlaying) {
+      try {
+        recognitionRef.current.start();
+      } catch {
+        // ignore "already started" errors
+      }
+    }
+  };
+
+  const stopMic = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // ignore "not started" errors
+      }
+    }
+  };
+
+  const toggleMic = () => {
+    setIsMicOn((prev) => !prev);
+  };
+
+  // Keep recognition in sync with mic toggle, AI speaking state, and phase
+  useEffect(() => {
+    if (isIntroPhase) return;
+
+    if (!isMicOn || isAIPlaying) {
+      stopMic();
+    } else {
+      startMic();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isIntroPhase, isMicOn, isAIPlaying, currentIndex]);
+
   const handleSubmitAnswer = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
@@ -154,18 +226,13 @@ function Step2Interview({ interviewData, onFinish }) {
       if (currentIndex < questions.length - 1) {
         setCurrentIndex((prev) => prev + 1);
         setAnswer("");
-        setTime(questions[currentIndex + 1]?.timeLimit || 60);
+        setTimeLeft(questions[currentIndex + 1]?.timeLimit || 60);
       } else {
         onFinish?.();
       }
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const toggleMic = () => {
-    setIsMicOn((prev) => !prev);
-    // TODO: wire actual speech recognition start/stop here if using recognitionRef
   };
 
   return (
@@ -209,7 +276,10 @@ function Step2Interview({ interviewData, onFinish }) {
             <div className="h-px bg-gray-200"></div>
 
             <div className="flex justify-center">
-              <Timer timeLeft={timeLeft} totalTime={questions[currentIndex]?.timeLimit || 60} />
+              <Timer
+                timeLeft={timeLeft}
+                totalTime={questions[currentIndex]?.timeLimit || 60}
+              />
             </div>
 
             <div className="h-px bg-gray-200"></div>
@@ -242,14 +312,16 @@ function Step2Interview({ interviewData, onFinish }) {
             AI Smart Interview
           </h2>
 
-          <div className="relative mb-6 bg-gray-50 p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <p className="text-xs sm:text-sm text-gray-400 mb-2">
-              Question {currentIndex + 1} of {questions.length}
-            </p>
-            <div className="text-base sm:text-lg font-semibold text-gray-800 leading-relaxed">
-              {currentQuestion?.question}
+          {!isIntroPhase && (
+            <div className="relative mb-6 bg-gray-50 p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-sm">
+              <p className="text-xs sm:text-sm text-gray-400 mb-2">
+                Question {currentIndex + 1} of {questions.length}
+              </p>
+              <div className="text-base sm:text-lg font-semibold text-gray-800 leading-relaxed">
+                {currentQuestion?.question}
+              </div>
             </div>
-          </div>
+          )}
 
           <textarea
             value={answer}
