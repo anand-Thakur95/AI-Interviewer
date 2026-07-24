@@ -248,9 +248,29 @@ function Step2Interview({ interviewData, onFinish }) {
   }
 
   const handleNext = async () => {
+setAnswer("")
+setFeedback("");
 
+if(currentIndex + 1 >= questions.length) {
+  finishInterview();
+  return;
+}
+
+await speakText("Alright, let's move to the next question.")
+
+setCurrentIndex(currentIndex + 1);
+setTimeout(()=> {
+  if(isMicOn) startMic();
+}, 500)
+  }
+
+  const finishInterview = async (params) => {
+    stopMic()
+    setIsMicOn(false)
     try {
-      
+      const result = await axios.post(serverUrl+ "/api/interview/finish", {
+        interviewId
+      }, {withCredentials: true})
     } catch (error) {
       
     }
@@ -379,7 +399,7 @@ function Step2Interview({ interviewData, onFinish }) {
 
 <p className="text-blue-800 font-medium mb-4">{feedback}</p>
               <button
-              
+              onClick={handleNext}
               className="w-full bg-graient-to-r from-blue-600 to-teal-500 text-white py-3 rounded-xl shadow-md hover:opacity-90 transition flex items-center justify-center gap-1">
 Next Question <BsArrowLeft size={18}/>
 
