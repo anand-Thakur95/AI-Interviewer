@@ -61,7 +61,7 @@ function Home() {
 
             {userData && (
               <motion.button
-                onClick={() => navigate("/interview")}
+                onClick={() => navigate("/history")}
                 whileHover={{ opacity: 0.9, scale: 1.03 }}
                 whileTap={{ opacity: 1, scale: 0.98 }}
                 className="bg-gray-200 text-black px-10 py-3 rounded-full hover:opacity-90 transition shadow-md shadow-gray-400"

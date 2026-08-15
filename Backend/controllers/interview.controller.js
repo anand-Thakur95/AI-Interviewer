@@ -317,3 +317,59 @@ export const finishInterview = async (req, res) => {
         return res.status(500).json({ message: `failed to finish interview ${error}` });
     }
 };
+
+export const getInterview = async (req, res) => {
+try {
+    const interviews = await Interview.find({userId: req.userId})
+    .sort({createdAt: -1})
+    .select("role experience mode resumeText questions finalScore status createdAt")
+
+
+    return res.status(200).json({interviews})
+} catch (error) {
+    
+return res.status(500).json({message: `failed to get interview ${error}`})
+
+}
+}
+
+export const getInterviewReport = async (req, res) => {
+try {
+    const interview = await Interview.findById(req.params.id)
+
+    if(!interview) {
+        return res.status(400).json({message: "interview not found"})
+    }
+
+    const totalQuestions = interview.questions.length;
+
+    let totalScore = 0;
+    let totalConfidence = 0;
+    let totalCorrectness = 0;
+
+
+    interview.questions.forEach((q) => {
+        totalConfidence += q.confidence || 0;
+        totalCommunication += q.communication || 0;
+        totalCorrectness += q.correctness || 0;
+    });
+
+    const avgConfidence = totalQuestions ? totalConfidence / totalQuestions : 0;
+
+    const avgCommunication = totalQuestions ? totalCommunication / totalQuestions : 0;
+
+    const avgCorrectness = totalQuestions ? totalCorrectness / totalQuestions : 0;
+
+    return res.status({
+finalScore: interview.finalScore,
+confidence: Number(avgConfidence.toFixed(1)),
+communication: Number(avgCommunication.toFixed(1)),
+correctness: Number(avgCorrectness.toFixed(1)),
+questionWiseScore: interview.questions.question
+    })
+} catch (error) {
+    return res.status(500).json({message: `failed to get interview report ${error}`})
+}
+
+
+}

@@ -1,6 +1,6 @@
 
 
-function Step3Report() {
+function Step3Report({reportData}) {
   return (
     <div>Step3Report</div>
   )
