@@ -341,12 +341,15 @@ try {
         return res.status(400).json({message: "interview not found"})
     }
 
+    if (interview.userId.toString() !== req.userId) {
+        return res.status(403).json({message: "unauthorized"})
+    }
+
     const totalQuestions = interview.questions.length;
 
-    let totalScore = 0;
     let totalConfidence = 0;
+    let totalCommunication = 0;
     let totalCorrectness = 0;
-
 
     interview.questions.forEach((q) => {
         totalConfidence += q.confidence || 0;
@@ -355,21 +358,29 @@ try {
     });
 
     const avgConfidence = totalQuestions ? totalConfidence / totalQuestions : 0;
-
     const avgCommunication = totalQuestions ? totalCommunication / totalQuestions : 0;
-
     const avgCorrectness = totalQuestions ? totalCorrectness / totalQuestions : 0;
 
-    return res.status({
-finalScore: interview.finalScore,
-confidence: Number(avgConfidence.toFixed(1)),
-communication: Number(avgCommunication.toFixed(1)),
-correctness: Number(avgCorrectness.toFixed(1)),
-questionWiseScore: interview.questions.question
+    return res.status(200).json({
+        role: interview.role,
+        experience: interview.experience,
+        mode: interview.mode,
+        createdAt: interview.createdAt,
+        finalScore: Number(interview.finalScore?.toFixed?.(1) ?? interview.finalScore ?? 0),
+        confidence: Number(avgConfidence.toFixed(1)),
+        communication: Number(avgCommunication.toFixed(1)),
+        correctness: Number(avgCorrectness.toFixed(1)),
+        questions: interview.questions.map((q) => ({
+            question: q.question,
+            answer: q.answer || "",
+            score: q.score || 0,
+            feedback: q.feedback || "",
+            confidence: q.confidence || 0,
+            communication: q.communication || 0,
+            correctness: q.correctness || 0,
+        }))
     })
 } catch (error) {
     return res.status(500).json({message: `failed to get interview report ${error}`})
 }
-
-
 }

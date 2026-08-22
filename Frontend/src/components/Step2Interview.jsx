@@ -6,10 +6,12 @@ import { motion } from "motion/react";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import axios from "axios";
 import { serverUrl } from "../App";
-import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
+import { BsArrowRight } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 function Step2Interview({ interviewData, onFinish }) {
   const { interviewId, questions, userName } = interviewData;
+  const navigate = useNavigate();
 
   const [isIntroPhase, setIsIntroPhase] = useState(true);
   const [isMicOn, setIsMicOn] = useState(true);
@@ -25,6 +27,7 @@ function Step2Interview({ interviewData, onFinish }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [voiceGender, setVoiceGender] = useState("female");
   const [subtitle, setSubtitle] = useState("");
+  const [isFinishing, setIsFinishing] = useState(false);
 
   const videoRef = useRef(null);
 
@@ -126,7 +129,7 @@ function Step2Interview({ interviewData, onFinish }) {
         );
         if (cancelled) return;
         setIsIntroPhase(false);
-        return; // next question is spoken by the currentIndex-triggered run below
+        return;
       }
 
       if (currentIndex === questions.length - 1) {
@@ -146,7 +149,7 @@ function Step2Interview({ interviewData, onFinish }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedVoice, isIntroPhase, currentIndex]);
 
-  // 🔧 FIX: Reset timer whenever the question changes
+  // Reset timer whenever the question changes
   useEffect(() => {
     if (!currentQuestion) return;
     setTimeLeft(currentQuestion.timeLimit || 60);
@@ -156,7 +159,6 @@ function Step2Interview({ interviewData, onFinish }) {
   useEffect(() => {
     if (isIntroPhase) return;
     if (!currentQuestion) return;
-    // if(isSubmitting) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -252,13 +254,13 @@ function Step2Interview({ interviewData, onFinish }) {
   };
 
   const handleNext = async () => {
-    setAnswer("");
-    setFeedback("");
-
     if (currentIndex + 1 >= questions.length) {
-      finishInterview();
+      await finishInterview();
       return;
     }
+
+    setAnswer("");
+    setFeedback("");
 
     await speakText("Alright, let's move to the next question.");
 
@@ -268,17 +270,23 @@ function Step2Interview({ interviewData, onFinish }) {
     }, 500);
   };
 
+  // 🆕 finish hone ke baad InterviewReport page par navigate karo
   const finishInterview = async () => {
     stopMic();
     setIsMicOn(false);
+    setIsFinishing(true);
+
     try {
       await axios.post(
         serverUrl + "/api/interview/finish",
         { interviewId },
         { withCredentials: true },
       );
+
+      navigate(`/report/${interviewId}`);
     } catch (error) {
       console.log(error);
+      setIsFinishing(false);
     }
   };
 
@@ -300,7 +308,6 @@ function Step2Interview({ interviewData, onFinish }) {
             ></video>
           </div>
 
-          {/* subtitle */}
           {subtitle && (
             <div className="w-full max-w-md bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm">
               <p className="text-gray-700 text-sm sm:text-base font-medium text-center leading-relaxed">
@@ -309,7 +316,6 @@ function Step2Interview({ interviewData, onFinish }) {
             </div>
           )}
 
-          {/* timer area */}
           <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-md p-6 space-y-5">
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-500">Interview Status</span>
@@ -407,9 +413,15 @@ function Step2Interview({ interviewData, onFinish }) {
               <p className="text-blue-800 font-medium mb-4">{feedback}</p>
               <button
                 onClick={handleNext}
-                className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-3 rounded-xl shadow-md hover:opacity-90 transition flex items-center justify-center gap-1"
+                disabled={isFinishing}
+                className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-3 rounded-xl shadow-md hover:opacity-90 transition flex items-center justify-center gap-1 disabled:opacity-50"
               >
-                Next Question <BsArrowRight size={18} />
+                {currentIndex + 1 >= questions.length
+                  ? isFinishing
+                    ? "Finishing..."
+                    : "Finish Interview"
+                  : "Next Question"}
+                {currentIndex + 1 < questions.length && <BsArrowRight size={18} />}
               </button>
             </motion.div>
           )}
