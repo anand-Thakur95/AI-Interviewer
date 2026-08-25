@@ -2,7 +2,8 @@ import React from 'react'
 
 function pricing() {
   return (
-    <div>pricing</div>
+    <div className="min-h-screen bg-gradient">
+
   )
 }
 

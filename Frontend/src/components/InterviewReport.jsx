@@ -2,33 +2,16 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { jsPDF } from 'jspdf'
-import { buildStyles, CircularProgressbar } from 'react-circular-progressbar'
-import 'react-circular-progressbar/dist/styles.css'
+import {
+  PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid
+} from 'recharts'
 import { BsDownload, BsArrowLeft } from 'react-icons/bs'
 import { serverUrl } from '../App'
 import Navbar from './Navbar'
 import Footer from './Footer'
 
-function ScoreRing({ value, label, color }) {
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="w-24 h-24">
-        <CircularProgressbar
-          value={value}
-          maxValue={10}
-          text={`${value}`}
-          styles={buildStyles({
-            textSize: '28px',
-            pathColor: color,
-            textColor: '#111',
-            trailColor: '#e5e7eb',
-          })}
-        />
-      </div>
-      <span className="text-sm text-gray-500">{label}</span>
-    </div>
-  )
-}
+const COLORS = ['#2563eb', '#7c3aed', '#059669', '#d97706']
 
 function InterviewReport() {
   const { id } = useParams()
@@ -113,6 +96,26 @@ function InterviewReport() {
     doc.save(fileName)
   }
 
+  // Data for the overall performance donut chart
+  const overallChartData = reportData
+    ? [
+        { name: 'Final Score', value: reportData.finalScore },
+        { name: 'Confidence', value: reportData.confidence },
+        { name: 'Communication', value: reportData.communication },
+        { name: 'Correctness', value: reportData.correctness },
+      ]
+    : []
+
+  // Data for the question-wise trend line chart
+  const trendChartData =
+    reportData?.questions?.map((q, i) => ({
+      name: `Q${i + 1}`,
+      Score: q.score,
+      Confidence: q.confidence,
+      Communication: q.communication,
+      Correctness: q.correctness,
+    })) || []
+
   return (
     <div className="min-h-screen bg-[#f3f3f3] flex flex-col">
       <Navbar />
@@ -157,15 +160,58 @@ function InterviewReport() {
                 </button>
               </div>
 
+              {/* Overall Performance — Donut Chart */}
               <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm mb-6">
                 <h2 className="text-lg font-semibold mb-6">Overall Performance</h2>
-                <div className="flex flex-wrap justify-center gap-8">
-                  <ScoreRing value={reportData.finalScore} label="Final Score" color="#2563eb" />
-                  <ScoreRing value={reportData.confidence} label="Confidence" color="#7c3aed" />
-                  <ScoreRing value={reportData.communication} label="Communication" color="#059669" />
-                  <ScoreRing value={reportData.correctness} label="Correctness" color="#d97706" />
+                <div className="w-full h-72 flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={overallChartData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={95}
+                        paddingAngle={3}
+                        label={({ value }) => `${value}/10`}
+                      >
+                        {overallChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend
+                        verticalAlign="bottom"
+                        height={36}
+                        wrapperStyle={{ fontSize: '12px' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
+
+              {/* Question-wise Trend — Line Chart */}
+              {trendChartData.length > 1 && (
+                <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm mb-6">
+                  <h2 className="text-lg font-semibold mb-6">Performance Trend Across Questions</h2>
+                  <div className="w-full h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={trendChartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                        <YAxis domain={[0, 10]} tick={{ fontSize: 12 }} />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="Score" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
+                        <Line type="monotone" dataKey="Confidence" stroke="#7c3aed" strokeWidth={2} dot={{ r: 3 }} />
+                        <Line type="monotone" dataKey="Communication" stroke="#059669" strokeWidth={2} dot={{ r: 3 }} />
+                        <Line type="monotone" dataKey="Correctness" stroke="#d97706" strokeWidth={2} dot={{ r: 3 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
 
               <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
                 <h2 className="text-lg font-semibold mb-6">Question-wise Analysis</h2>
