@@ -1,12 +1,19 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { setUserData } from "../redux/user.slice";
 
 function Pricing() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
 
   const [selectedPlan, setSelectedPlan] = useState("free");
+  const [loadingPlan, setLoadingPlan] = useState(null);
 
   const plans = [
     {
@@ -59,12 +66,105 @@ function Pricing() {
     setSelectedPlan(planId);
   };
 
-  const handlePayment = (plan) => {
-    console.log("Proceeding to payment:", plan);
+  const handlePayment = async (plan) => {
+    if (!userData) {
+      
+      alert("Please log in to purchase credits.");
+      navigate("/auth");
+      return;
+    }
 
-    // Payment logic will come here
-    // Example:
-    // navigate("/payment", { state: { plan } });
+    if (!window.Razorpay) {
+      alert("Razorpay SDK failed to load. Please check your internet connection or disable adblockers and refresh the page.");
+      return;
+    }
+
+    try {
+      setLoadingPlan(plan.id);
+
+      const amount = parseInt(plan.price.replace("₹", ""), 10);
+
+      const result = await axios.post(
+        serverUrl + "/api/payment/order",
+        {
+          planId: plan.id,
+          amount: amount,
+          credits: plan.credits,
+        },
+        { withCredentials: true }
+        
+          
+          
+
+        
+      );
+
+      const razorpayKey =
+        import.meta.env.VITE_RAZORPAY_KEY_ID ||
+        import.meta.env.VITE_RAZORPY_KEY_ID ||
+        result.data.keyId;
+
+      if (!razorpayKey) {
+        alert("Razorpay key is not configured.");
+        return;
+      }
+
+      const option = {
+        key: razorpayKey,
+        amount: result.data.amount,
+        currency: "INR",
+        name: "InterviewIQ.AI",
+        description: `${plan.name} - ${plan.credits} Credits`,
+        order_id: result.data.id,
+
+        handler: async function (response) {
+          try {
+            const verifyRes = await axios.post(
+              serverUrl + "/api/payment/verify",
+              {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                planId: plan.id,
+                credits: plan.credits,
+              },
+              { withCredentials: true }
+            );
+
+            if (verifyRes.data?.user) {
+              dispatch(setUserData(verifyRes.data.user));
+            }
+            alert("Payment successful! Credits added to your account.");
+            navigate("/");
+          } catch (verifyError) {
+            console.error("Payment verification failed:", verifyError);
+            alert(
+              verifyError.response?.data?.message ||
+                "Payment verification failed. Please contact support."
+            );
+          }
+        },
+        theme: {
+          color: "#10b981",
+        },
+      };
+
+      const rzp = new window.Razorpay(option);
+      rzp.on("payment.failed", function (failResponse) {
+        console.error("Razorpay payment failed:", failResponse.error);
+        alert(`Payment failed: ${failResponse.error.description || failResponse.error.reason}`);
+      });
+      rzp.open();
+    } catch (error) {
+      console.error("Payment initiation failed:", error);
+      const errMsg =
+        error.response?.data?.message ||
+        error.message ||
+        "Payment initiation failed. Please try again.";
+      alert(errMsg);
+    } finally {
+      setLoadingPlan(null);
+    }
   };
 
   return (
@@ -95,6 +195,7 @@ function Pricing() {
 
         {plans.map((plan) => {
           const isSelected = selectedPlan === plan.id;
+          const isLoading = loadingPlan === plan.id;
 
           return (
             <motion.div
@@ -162,15 +263,17 @@ function Pricing() {
                         handlePayment(plan);
                       }
                     }}
-                    disabled={plan.default}
+                    disabled={plan.default || isLoading}
                     className={`w-full py-3 rounded-xl font-semibold transition ${
                       plan.default
                         ? "bg-gray-200 text-gray-500 cursor-default"
-                        : "bg-blue-600 text-white hover:bg-blue-700"
+                        : "bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
                     }`}
                   >
                     {plan.default
                       ? "Selected"
+                      : isLoading
+                      ? "Processing..."
                       : "Proceed to Pay"}
                   </button>
                 ) : (

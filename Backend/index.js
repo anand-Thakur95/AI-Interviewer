@@ -6,6 +6,7 @@ import cors from "cors"
 import authRouter from "./routers/auth.route.js";
 import userRouter from "./routers/user.router.js";
 import interRouter from "./routers/inter.route.js";
+import paymentRouter from "./routers/payment.route.js";
 
 
 dotenv.config();
@@ -25,6 +26,10 @@ app.use("/api/auth", authRouter)
 app.use("/api/user", userRouter)
 
 app.use("/api/interview", interRouter)
+
+app.use("/api/payment", paymentRouter)
+app.use("/payment", paymentRouter)
+
 
 const PORT  = process.env.PORT || 5000;
 app.listen(PORT, ()=> {
