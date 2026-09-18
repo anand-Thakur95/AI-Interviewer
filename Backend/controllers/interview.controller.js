@@ -248,7 +248,8 @@ export const submitAnswer = async (req, res) => {
 
     
         const aiResponse = await askAi(messages);
-        const parsed = JSON.parse(aiResponse);
+        const cleaned = aiResponse.replace(/```json|```/g, "").trim();
+        const parsed = JSON.parse(cleaned);
 
         question.answer = answer;
         question.confidence = parsed.confidence;

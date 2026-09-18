@@ -75,8 +75,8 @@ export const verifyPayment = async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(
       payment.userId,
-      { $inc: { credits: payment.credits } },
-      { new: true }
+      { $inc: { credit: payment.credits } },
+      {returnDocument: 'after'}
     );
 
     res.json({

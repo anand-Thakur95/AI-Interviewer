@@ -13,14 +13,25 @@ import Footer from './Footer'
 
 const COLORS = ['#2563eb', '#7c3aed', '#059669', '#d97706']
 
-function InterviewReport() {
+function InterviewReport({ report }) {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [reportData, setReportData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [reportData, setReportData] = useState(report || null)
+  const [loading, setLoading] = useState(!report)
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    if (report) {
+      setReportData(report)
+      setLoading(false)
+      return
+    }
+
+    if (!id) {
+      setLoading(false)
+      return
+    }
+
     const fetchReport = async () => {
       try {
         const result = await axios.get(
@@ -36,7 +47,7 @@ function InterviewReport() {
       }
     }
     fetchReport()
-  }, [id])
+  }, [id, report])
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {
