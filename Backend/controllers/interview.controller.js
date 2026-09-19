@@ -1,4 +1,7 @@
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const pdfParse = require("pdf-parse");
+
 import { askAi } from "../services/openRouter.service.js";
 import User from "../model/user.model.js";
 import Interview from "../model/inter.model.js";
@@ -9,18 +12,14 @@ export const analyzeResume = async (req, res) => {
             return res.status(400).json({ message: "Resume required" });
         }
 
-        const uint8Array = new Uint8Array(req.file.buffer);
-        const pdf = await pdfjsLib.getDocument({ data: uint8Array }).promise;
-
-        let resumeText = "";
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-            const page = await pdf.getPage(pageNum);
-            const content = await page.getTextContent();
-            const pageText = content.items.map(item => item.str).join(" ");
-            resumeText += pageText + "\n";
-        }
+        const data = await pdfParse(req.file.buffer);
+        let resumeText = data.text || "";
 
         resumeText = resumeText.replace(/\s+/g, " ").trim();
+
+        if (!resumeText) {
+            return res.status(400).json({ message: "Could not extract text from this PDF. Try a different file." });
+        }
 
         const messages = [
             {
@@ -182,8 +181,19 @@ export const submitAnswer = async (req, res) => {
     try {
         const { interviewId, questionIndex, answer, timeTaken } = req.body;
 
+        if (!interviewId || questionIndex === undefined || questionIndex === null) {
+            return res.status(400).json({ message: "interviewId and questionIndex are required" });
+        }
+
         const interview = await Interview.findById(interviewId);
+        if (!interview) {
+            return res.status(400).json({ message: "Interview not found" });
+        }
+
         const question = interview.questions[questionIndex];
+        if (!question) {
+            return res.status(400).json({ message: "Invalid questionIndex" });
+        }
 
         if (!answer) {
             question.score = 0;
