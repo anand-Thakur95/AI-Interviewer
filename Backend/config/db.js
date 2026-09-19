@@ -3,17 +3,23 @@ import mongoose from "mongoose";
 
 dotenv.config();
 
+let isConnected = false;
+
 const connectDB = async () => {
+    if (isConnected || mongoose.connection.readyState >= 1) {
+        return;
+    }
+
     try {
         const MONGO_URL = process.env.MONGO_URL;
         if (!MONGO_URL) {
             throw new Error("Missing MONGO_URL in .env");
         }
         await mongoose.connect(MONGO_URL);
+        isConnected = true;
         console.log("Connected to MongoDB");
     } catch (error) {
-        console.log(error);
-        process.exit(1);
+        console.error("MongoDB connection error:", error);
     }
 };
 

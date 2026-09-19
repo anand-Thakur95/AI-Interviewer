@@ -16,23 +16,36 @@ app.use(express.json())
 
 app.use(cookieParser())
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    process.env.CLIENT_URL
+].filter(Boolean);
+
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production") {
+            return callback(null, true);
+        }
+        return callback(null, true);
+    },
     credentials: true
-}))
+}));
 
-app.use("/api/auth", authRouter)
+connectDB();
 
-app.use("/api/user", userRouter)
+app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
+app.use("/api/interview", interRouter);
+app.use("/api/payment", paymentRouter);
+app.use("/payment", paymentRouter);
 
-app.use("/api/interview", interRouter)
+const PORT = process.env.PORT || 5000;
 
-app.use("/api/payment", paymentRouter)
-app.use("/payment", paymentRouter)
+if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`server is running on port ${PORT}`);
+    });
+}
 
-
-const PORT  = process.env.PORT || 5000;
-app.listen(PORT, ()=> {
-    connectDB();
-    console.log(`server is running on port ${PORT}`)
-})
+export default app;
