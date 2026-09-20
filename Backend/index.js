@@ -17,10 +17,10 @@ app.use(express.json())
 app.use(cookieParser())
 
 const allowedOrigins = [
-    "http://localhost:5173",
-    "http://localhost:3000",
     process.env.CLIENT_URL
+  
 ].filter(Boolean);
+
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -33,6 +33,10 @@ app.use(cors({
 }));
 
 connectDB();
+
+app.get("/", (req, res) => {
+    res.status(200).json({ status: "ok", message: "AI Interviewer Backend is running" });
+});
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
