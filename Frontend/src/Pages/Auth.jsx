@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { BsRobot } from 'react-icons/bs'
 import { IoSparkles } from 'react-icons/io5'
 import { motion } from "motion/react"
@@ -14,7 +15,12 @@ function Auth({ onClose }) {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
+    const [loading, setLoading] = useState(false)
+    const [authError, setAuthError] = useState("")
+
     const handleGoogleAuth = async () => {
+        setAuthError("")
+        setLoading(true)
         try {
             const response = await signInWithPopup(auth, provider)
             let User = response.user
@@ -26,7 +32,16 @@ function Auth({ onClose }) {
             if (onClose) onClose()
             else navigate('/')
         } catch (error) {
-            console.log(error)
+            console.error("Auth error:", error)
+            if (error.code === 'auth/unauthorized-domain') {
+                setAuthError(`Current domain (${window.location.hostname}) is not authorized in Firebase Console. Please add it under Authentication > Settings > Authorized domains.`)
+            } else if (error.code === 'auth/popup-closed-by-user') {
+                // User intentionally cancelled popup
+            } else {
+                setAuthError(error.response?.data?.message || error.message || "Failed to authenticate with Google")
+            }
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -60,12 +75,19 @@ function Auth({ onClose }) {
 
                 <motion.button
                     onClick={handleGoogleAuth}
+                    disabled={loading}
                     whileHover={{ opacity: 0.9, scale: 1.03 }}
                     whileTap={{ opacity: 1, scale: 0.9 }}
-                    className='w-full flex items-center justify-center gap-3 py-3 bg-black text-white rounded-full shadow-md'>
+                    className='w-full flex items-center justify-center gap-3 py-3 bg-black text-white rounded-full shadow-md disabled:opacity-60 disabled:cursor-not-allowed'>
                     <FcGoogle size={20} />
-                    Continue with Google
+                    {loading ? 'Signing in...' : 'Continue with Google'}
                 </motion.button>
+
+                {authError && (
+                    <p className='mt-4 text-sm text-red-500 text-center bg-red-50 border border-red-200 rounded-xl px-4 py-3'>
+                        {authError}
+                    </p>
+                )}
 
                 {onClose && (
                     <button
