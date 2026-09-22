@@ -32,7 +32,16 @@ app.use(cors({
     credentials: true
 }));
 
-connectDB();
+
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error("DB connection failed for request:", err);
+        res.status(500).json({ message: "Database connection failed" });
+    }
+});
 
 app.get("/", (req, res) => {
     res.status(200).json({ status: "ok", message: "AI Interviewer Backend is running" });
@@ -42,6 +51,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/interview", interRouter);
 app.use("/api/payment", paymentRouter);
+app.use("/payment", paymentRouter);
 
 const PORT = process.env.PORT || 5000;
 
