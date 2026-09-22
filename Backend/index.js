@@ -42,7 +42,6 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/interview", interRouter);
 app.use("/api/payment", paymentRouter);
-app.use("/payment", paymentRouter);
 
 const PORT = process.env.PORT || 5000;
 

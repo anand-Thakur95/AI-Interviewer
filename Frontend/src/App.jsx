@@ -12,7 +12,6 @@ import InterviewReport from "./components/InterviewReport.jsx"
 
 export const serverUrl = import.meta.env.VITE_SERVERURL
 
-console.log(serverUrl)
 
 function App() {
 

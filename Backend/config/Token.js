@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken"
-import { ReturnDocument } from "mongodb"
 
 const genToken = async (userId) => {
     try {

@@ -95,7 +95,7 @@ function Pricing() {
         handler: async function (response) {
           try {
             await axios.post(
-              serverUrl + "/payment/verify",
+              serverUrl + "/api/payment/verify",
               {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
