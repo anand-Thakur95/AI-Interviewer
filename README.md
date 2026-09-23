@@ -32,19 +32,19 @@ The project combines AI integration, authentication, REST APIs, MongoDB, payment
 
 Users can securely sign in and start their AI-powered interview journey.
 
-![Google Authentication](./screenshots/login.png)
+![Google Authentication](./screenshot/ai-1.png)
 
 ### 💳 Interview Plans & Pricing
 
 Users can choose between Free, Starter, and Pro plans based on their interview preparation needs.
 
-![Interview Plans](./screenshots/pricing.png)
+![Interview Plans](./screenshot/ai-2.png)
 
 ### 🤖 AI Smart Interview
 
 The interview interface provides an AI-driven interview session with timed responses and an interactive question-and-answer experience.
 
-![AI Smart Interview](./screenshots/ai-interview.png)
+![AI Smart Interview](./screenshot/ai-3.png)
 
 ## Tech Stack
 
@@ -115,110 +115,6 @@ The AI interview screen provides:
 - AI-powered interview questions
 - Performance evaluation
 
-## Project Structure
-
-```text
-AI-Interviewer/
-│
-├── client/
-│   ├── public/
-│   └── src/
-│       ├── components/
-│       ├── pages/
-│       ├── hooks/
-│       ├── services/
-│       ├── context/
-│       └── App.jsx
-│
-├── server/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── middleware/
-│   ├── config/
-│   ├── utils/
-│   └── server.js
-│
-├── screenshots/
-├── .gitignore
-└── README.md
-```
-
-## Environment Variables
-
-### Backend
-
-```env
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-AI_API_KEY=your_ai_api_key
-
-PAYMENT_KEY_ID=your_payment_key
-PAYMENT_KEY_SECRET=your_payment_secret
-
-FIREBASE_PROJECT_ID=your_project_id
-FIREBASE_CLIENT_EMAIL=your_client_email
-FIREBASE_PRIVATE_KEY=your_private_key
-```
-
-### Frontend
-
-```env
-VITE_API_URL=http://localhost:5000
-```
-
-> Never commit `.env` files, API keys, payment secrets, or Firebase private credentials to GitHub.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js
-- npm
-- MongoDB / MongoDB Atlas
-- Git
-
-### Clone the Repository
-
-```bash
-git clone YOUR_GITHUB_URL
-cd AI-Interviewer
-```
-
-### Install Frontend Dependencies
-
-```bash
-cd client
-npm install
-```
-
-### Install Backend Dependencies
-
-```bash
-cd ../server
-npm install
-```
-
-### Start Backend
-
-```bash
-npm run dev
-```
-
-### Start Frontend
-
-```bash
-cd ../client
-npm run dev
-```
-
-The frontend will normally be available at:
-
-```text
-http://localhost:5173
-```
-
 ## Security
 
 The application follows common security practices including:
@@ -279,7 +175,7 @@ Building this project provided hands-on experience with:
 **MERN Stack Developer**
 
 - GitHub: [@anand-Thakur95](https://github.com/anand-Thakur95)
-- LinkedIn: [Anand Thakur](https://linkedin.com/in/anand-thakur-)
+- LinkedIn: [Anand Thakur](https://linkedin.com/in/anand-thakur01)
 - Portfolio: [portfolio-anand-72.vercel.app](https://portfolio-anand-72.vercel.app/)
 
 ## License
